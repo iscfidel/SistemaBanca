@@ -1,4 +1,4 @@
-package com.fagr;
+package com.fagr.entity;
 
 public class User {
     private String name;
