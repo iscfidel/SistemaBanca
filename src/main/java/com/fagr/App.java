@@ -1,43 +1,27 @@
 package com.fagr;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
-import com.mysql.jdbc.Statement;
+import java.sql.Connection;
+
+import com.fagr.entity.User;
+import com.fagr.utils.DatabaseConnection;
 
 public class App {
     public static void main(String[] args) {
+        User user = new User();
         // Obtener la instancia Singleton
-        DatabaseConnection dbConnection = DatabaseConnection.getInstance();
-
+        DatabaseConnection db = DatabaseConnection.getInstance();
         // Obtener la conexión
-        Connection connection = dbConnection.getConnection();
+        Connection connection = db.getConnection();
 
-        // Llamar al método para mostrar usuarios
-        ejecutarSelect(connection, "SELECT * FROM usuarios");
+        String[] columnas = user.getColumns();
+        String[] filtrarColumnas = user.getFiltrarColumnas();
+        String[] operadores = user.getOperadores();
+        String[] filtrarValores = user.getFiltrarValores();
+
+        String sql = db.ejecutarSelectSQL("users",  columnas, filtrarColumnas, filtrarValores, operadores);
+        db.ejecutarConsulta(sql);
 
         // Cerrar la conexión
-        dbConnection.closeConnection();
+        db.closeConnection();
     }
-
-    public static void ejecutarSelect(Connection connection, String query) {
-        try (Statement statement = (Statement) connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(query)) {
-
-            int columnCount = resultSet.getMetaData().getColumnCount();
-            while (resultSet.next()) {
-                for (int i = 1; i <= columnCount; i++) {
-                    String columnName = resultSet.getMetaData().getColumnName(i);
-                    String value = resultSet.getString(i);
-                    System.out.print(columnName + ": " + value + " ");
-                }
-                System.out.println();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Ejemplo de uso en el main:
-    // ejecutarSelect(connection, "SELECT * FROM usuarios");
 }
